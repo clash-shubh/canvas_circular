@@ -51,26 +51,34 @@ function Particle(x, y, radius, color) {
     this.radians=Math.random() * Math.PI*2;
     this.velocity= .05;
     this.distanceFromCenter = randomIntFromRange(50,120);
-
+    this.lastMouse = {x:x,y:y};
 
     this.update = function() {
+      const lastPoint = {x : this.x, y : this.y};
+      //move points over time
       this.radians+= this.velocity;
-        this.x = x+Math.cos(this.radians)*this.distanceFromCenter;
-        this.y = y+Math.sin(this.radians)*this.distanceFromCenter;
+
+      //drag effect
+      this.lastMouse.x += (mouse.x-this.lastMouse.x) * 0.05;
+      this.lastMouse.y += (mouse.y-this.lastMouse.y) * 0.05;
+
+      //circular motion
+        this.x = this.lastMouse.x+Math.cos(this.radians)*this.distanceFromCenter;
+        this.y = this.lastMouse.y+Math.sin(this.radians)*this.distanceFromCenter;
 
 
-        this.draw();
-    }
+        this.draw(lastPoint);
+    };
 
-    this.draw = function() {
+    this.draw = function(lastPoint) {
         c.beginPath();
         c.strokeStyle=this.color;
         c.lineWidth=this.radius;
-        c.moveTo();
-        c.lineTo();
+        c.moveTo(lastPoint.x,lastPoint.y);
+        c.lineTo(this.x,this.y);
         c.stroke();
         c.closePath();
-    }
+    };
 
 }
 
@@ -82,7 +90,7 @@ function init() {
     particleArray = [];
 
     for (let i = 0; i < 50; i++) {
-        particleArray.push(new Particle(innerWidth/2,innerHeight/2,2,'blue'));
+        particleArray.push(new Particle(innerWidth/2,innerHeight/2,(Math.random()*2)+1,randomColor(colors)));
     }
     console.log(particleArray);
 }
